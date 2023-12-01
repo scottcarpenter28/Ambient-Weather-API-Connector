@@ -1,0 +1,29 @@
+[project]
+name = "ambient_weather_api"
+version = "0.1.0"  # Required
+description = "An API connector for Ambient Weather"
+requires-python = ">=3.10"
+authors = [
+  {name = "Scott Carpenter"}
+]
+
+maintainers = [
+  {name = "Scott Carpenter", email = "scottcarpenter28@gmail.com"}
+]
+
+dependencies = [
+  "requests",
+  "pydantic"
+]
+
+[project.optional-dependencies] # Optional
+dev = ["python-dotenv"]
+
+[project.urls]  # Optional
+"Homepage" = "https://github.com/scottcarpenter28/Ambient-Weather-API-Connector"
+"Bug Reports" = "https://github.com/scottcarpenter28/Ambient-Weather-API-Connector/issues"
+
+[build-system]
+requires = ["setuptools>=43.0.0", "wheel"]
+build-backend = "setuptools.build_meta"
+package-dir = "src"

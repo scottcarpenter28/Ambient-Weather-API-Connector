@@ -1,0 +1,4 @@
+src/ambient_weather_api.egg-info
+*.env
+venv/
+.vscode/
