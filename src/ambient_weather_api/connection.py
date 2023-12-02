@@ -1,6 +1,7 @@
+from datetime import datetime
+import time
 import logging
 from typing import Any, Dict, List
-import pprint
 
 from ambient_weather_api.datatypes.device import Device
 from ambient_weather_api.datatypes.weather_data import WeatherData
@@ -21,6 +22,7 @@ class Connection:
         self.timeout = timeout
 
         self.logger = logging.Logger(__name__)
+        self.last_call_time = None
 
     def _get(self, url: str, params: Dict[str, Any] = {}) -> dict | None:
         """
@@ -30,6 +32,13 @@ class Connection:
         :return : None if an error occurred, or dictionary of the response if ok.
         """
         params.update({"applicationKey": self.application_key, "apiKey": self.api_key})
+
+        current_time = int(time.time())
+        if self.last_call_time is not None:
+            while current_time <= self.last_call_time + 1:
+                time.sleep(1)
+                current_time = int(time.time())
+        self.last_call_time = current_time
 
         try:
             response: Response = get(url=url, params=params, timeout=self.timeout)
@@ -49,6 +58,14 @@ class Connection:
         result = self._get("https://rt.ambientweather.net/v1/devices")
         if result is None:
             return []
-        pp = pprint.PrettyPrinter(indent=4)
-        pp.pprint(result)
         return [Device(**station) for station in result]
+    
+    def get_device_data(self, station: Device, end_date: datetime | None = None, limit: int = 288) -> List[WeatherData]:
+        params: Dict[str, Any] = {}
+        if end_date is not None:
+            params["endDate"] = int(end_date.timestamp * 1000)
+        
+        result = self._get(f"https://rt.ambientweather.net/v1/devices/{station.macAddress}", params)
+        if result is None:
+            return []
+        return [WeatherData(**data) for data in result]

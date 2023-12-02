@@ -24,7 +24,7 @@ class WeatherData(BaseModel):
     solarradiation: float
     tempf: float
     tempinf: float
-    tz: str
+    tz: str | None = None
     uv: float
     weeklyrainin: float
     winddir: int

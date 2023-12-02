@@ -19,5 +19,10 @@ class TestAPIIntegration(unittest.TestCase):
         result = self.conn.get_user_devices()
         self.assertEqual(len(result), 1)
 
+    def test_get_weather_data(self):
+        stations = self.conn.get_user_devices()
+        result = self.conn.get_device_data(station=stations[0])
+        self.assertEqual(len(result), 288)
+
 if __name__ == "__main__":
     unittest.main()
