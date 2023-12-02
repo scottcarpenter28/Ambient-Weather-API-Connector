@@ -2,4 +2,4 @@ src/ambient_weather_api.egg-info
 *.env
 venv/
 .vscode/
-*/__pycache__
+__pycache__/
