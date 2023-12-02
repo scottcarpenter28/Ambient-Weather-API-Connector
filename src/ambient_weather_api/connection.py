@@ -1,6 +1,9 @@
 import logging
 from typing import Any, Dict
 
+from ambient_weather_api.datatypes.device import Device
+from ambient_weather_api.datatypes.weather_data import WeatherData
+
 from requests import get, Response
 from requests import codes
 from requests.exceptions import JSONDecodeError

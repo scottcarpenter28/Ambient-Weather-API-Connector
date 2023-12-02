@@ -1,6 +1,6 @@
 import unittest
 
-# from ambient_weather_api.datatypes.device import Device, Info
+from ambient_weather_api.datatypes.device import Device
 from ambient_weather_api.datatypes.weather_data import WeatherData
 
 
@@ -68,6 +68,10 @@ class TestDataTypes(unittest.TestCase):
     def test_weather_data(self):
         result = WeatherData(**self.mock_device_data_response)
         self.assertTrue(isinstance(result, WeatherData))
+
+    def test_device_data(self):
+        result = Device(**self.mock_user_devices_response)
+        self.assertTrue(isinstance(result, Device))
 
 if __name__ == "__main__":
     unittest.main()
