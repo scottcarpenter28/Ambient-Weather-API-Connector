@@ -16,7 +16,8 @@ class TestAPIIntegration(unittest.TestCase):
         pass
 
     def test_get_user_devices(self):
-        self.conn.get_user_devices()
+        result = self.conn.get_user_devices()
+        self.assertEqual(len(result), 1)
 
 if __name__ == "__main__":
     unittest.main()

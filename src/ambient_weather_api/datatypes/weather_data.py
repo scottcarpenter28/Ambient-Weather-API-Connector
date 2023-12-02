@@ -3,28 +3,35 @@ from pydantic import BaseModel
 
 
 class WeatherData(BaseModel):
-    dateutc: float
-    date: datetime
-    winddir: int
-    windspeedmph: float
-    windgustmph: float
-    maxdailygust: float
-    windgustdir: int
-    winddir_avg2m: int
-    windspdmph_avg2m: float
-    winddir_avg10m: int
-    windspdmph_avg10m: float
-    tempf: float
-    humidity: int
-    baromrelin: float
     baromabsin: float
-    tempinf: float
-    humidityin: int
-    hourlyrainin: float
+    baromrelin: float
+    battin: int
+    battout: int
     dailyrainin: float
-    monthlyrainin: float
-    yearlyrainin: float
-    feelsLike: float
+    date: datetime
+    dateutc: float
     dewPoint: float
+    dewPointin: float
+    eventrainin: float
+    feelsLike: float
+    feelsLikein: float
+    hourlyrainin: float
+    humidity: float
+    humidityin: float
+    lastRain: datetime
+    maxdailygust: float
+    monthlyrainin: float
+    solarradiation: float
+    tempf: float
+    tempinf: float
+    tz: str
+    uv: float
+    weeklyrainin: float
+    winddir: int
+    winddir_avg10m: int
+    windgustmph: float
+    windspdmph_avg10m: float
+    windspeedmph: float
+    yearlyrainin: float
 
     # Todo: Unit conversions

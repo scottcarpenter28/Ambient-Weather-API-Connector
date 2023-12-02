@@ -1,11 +1,12 @@
 import logging
-from typing import Any, Dict
+from typing import Any, Dict, List
+import pprint
 
 from ambient_weather_api.datatypes.device import Device
 from ambient_weather_api.datatypes.weather_data import WeatherData
 
 from requests import get, Response
-from requests import codes
+from requests import Timeout, HTTPError
 from requests.exceptions import JSONDecodeError
 
 class Connection:
@@ -32,21 +33,22 @@ class Connection:
 
         try:
             response: Response = get(url=url, params=params, timeout=self.timeout)
-        except TimeoutError as e:
+            response.raise_for_status()
+            return response.json()
+        except Timeout as e:
             self.logger.error(e)
             return None
-        
-        if not response.status_code == codes.ok:
-            self.logger.error(f"{response.status_code}: {response.text}")
+        except HTTPError as e:
+            self.logger.error(e)
             return None
-        
-        try:
-            return response.json()
         except JSONDecodeError as e:
             self.logger.error(e)
             return None
-        
 
-    def get_user_devices(self, ):
+    def get_user_devices(self, ) -> List[Device]:
         result = self._get("https://rt.ambientweather.net/v1/devices")
-        print()
+        if result is None:
+            return []
+        pp = pprint.PrettyPrinter(indent=4)
+        pp.pprint(result)
+        return [Device(**station) for station in result]
