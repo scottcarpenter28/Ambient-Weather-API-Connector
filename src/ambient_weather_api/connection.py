@@ -1,7 +1,7 @@
 from datetime import datetime
 import time
 import logging
-from typing import Any, Dict, List
+from typing import Any, Callable, Dict, List
 
 from ambient_weather_api.datatypes.device import Device
 from ambient_weather_api.datatypes.weather_data import WeatherData
@@ -9,6 +9,26 @@ from ambient_weather_api.datatypes.weather_data import WeatherData
 from requests import get, Response
 from requests import Timeout, HTTPError
 from requests.exceptions import JSONDecodeError
+
+
+# Time that the API was last called. Limit to 1 request per second.
+last_call_time: int | None = None
+
+# Custom data type
+OptionalListDict = List[Dict[str, Any]] | None
+
+def LimitRate(func: Callable) -> Callable:
+    def check_last_call(*args, **kwargs):
+        global last_call_time
+        current_time: int = int(time.time())
+        if last_call_time is not None:
+            while current_time <= last_call_time + 1:
+                time.sleep(1)
+                current_time = int(time.time())
+        last_call_time = current_time
+
+        return func(*args, **kwargs)
+    return check_last_call
 
 
 class Connection:
@@ -23,9 +43,9 @@ class Connection:
         self.timeout = timeout
 
         self.logger = logging.Logger(__name__)
-        self.last_call_time = None
 
-    def _get(self, url: str, params: Dict[str, Any] = {}) -> dict | None:
+    @LimitRate
+    def _get(self, url: str, params: Dict[str, Any] = {}) -> OptionalListDict:
         """
         Makes a get request to the API. 
         :param url: The url of the request.
@@ -33,14 +53,6 @@ class Connection:
         :return : None if an error occurred, or dictionary of the response if ok.
         """
         params.update({"applicationKey": self.application_key, "apiKey": self.api_key})
-
-        current_time = int(time.time())
-        if self.last_call_time is not None:
-            while current_time <= self.last_call_time + 1:
-                time.sleep(1)
-                current_time = int(time.time())
-        self.last_call_time = current_time
-
         try:
             response: Response = get(url=url, params=params, timeout=self.timeout)
             response.raise_for_status()
@@ -60,7 +72,7 @@ class Connection:
         Gets a list of user devices.
         :return: A list of all devices.
         """
-        result = self._get("https://rt.ambientweather.net/v1/devices")
+        result: OptionalListDict = self._get("https://rt.ambientweather.net/v1/devices")
         return [] if result is None else [Device(**station) for station in result]
     
     def get_device_data(self, station: Device, end_date: datetime | None = None, limit: int = 288) -> List[WeatherData]:
@@ -71,7 +83,7 @@ class Connection:
         :param limit: The maximum data points to return. Max limit is 288.
         :return: A list of all matching weather data.
         """
-        params: Dict[str, Any] = {}
+        params: OptionalListDict = {}
         if end_date is not None:
             params["endDate"] = int(end_date.timestamp * 1000)
 
