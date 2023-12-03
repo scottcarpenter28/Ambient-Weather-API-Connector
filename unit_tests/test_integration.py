@@ -12,9 +12,6 @@ class TestAPIIntegration(unittest.TestCase):
             application_key=getenv("APPLICATION_KEY")
         )
 
-    def tearDown(self):
-        pass
-
     def test_get_user_devices(self):
         result = self.conn.get_user_devices()
         self.assertEqual(len(result), 1)
@@ -23,6 +20,8 @@ class TestAPIIntegration(unittest.TestCase):
         stations = self.conn.get_user_devices()
         result = self.conn.get_device_data(station=stations[0])
         self.assertEqual(len(result), 288)
+
+    # Todo: Add time based call.
 
 if __name__ == "__main__":
     unittest.main()

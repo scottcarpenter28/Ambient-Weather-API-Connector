@@ -10,6 +10,7 @@ from requests import get, Response
 from requests import Timeout, HTTPError
 from requests.exceptions import JSONDecodeError
 
+
 class Connection:
     def __init__(self, api_key: str, application_key: str, timeout: float | None = 10) -> None:
         """
@@ -54,18 +55,29 @@ class Connection:
             self.logger.error(e)
             return None
 
-    def get_user_devices(self, ) -> List[Device]:
+    def get_user_devices(self) -> List[Device]:
+        """
+        Gets a list of user devices.
+        :return: A list of all devices.
+        """
         result = self._get("https://rt.ambientweather.net/v1/devices")
-        if result is None:
-            return []
-        return [Device(**station) for station in result]
+        return [] if result is None else [Device(**station) for station in result]
     
     def get_device_data(self, station: Device, end_date: datetime | None = None, limit: int = 288) -> List[WeatherData]:
+        """
+        Gets a list of data from the device.
+        :param station: The weather station to get data for.
+        :param end_date: Optional date to end on. Sadly no control to select start date.
+        :param limit: The maximum data points to return. Max limit is 288.
+        :return: A list of all matching weather data.
+        """
         params: Dict[str, Any] = {}
         if end_date is not None:
             params["endDate"] = int(end_date.timestamp * 1000)
+
+        if limit <= 0 or limit > 288:
+            limit = 288
+        params["limit"] = limit
         
         result = self._get(f"https://rt.ambientweather.net/v1/devices/{station.macAddress}", params)
-        if result is None:
-            return []
-        return [WeatherData(**data) for data in result]
+        return [] if result is None else [WeatherData(**data) for data in result]
